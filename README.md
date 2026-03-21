@@ -1,4 +1,5 @@
-## D2-SHELL WEB FULLSTACK
+## Ativos International
+D2
 
 A seguinte entrega do projeto foi desenvolvida pelos alunos:
 FELIPE HYCZY, JOSUÉ CASTILHOS, JULIO GUZZO KUSTER E ANDREW BERTILLI
