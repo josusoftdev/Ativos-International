@@ -1,29 +1,37 @@
-# 🪙 Ativos International
-
-> Dashboard SaaS de criptomoedas — acompanhe o mercado, gerencie carteiras e fique por dentro das últimas notícias em um único lugar.
+# 🪙 Ativos International - Entrega Parcial D3. 
+> Dashboard SaaS de criptomoedas 
+> Deliver da "The Front-End Experience" de acordo com os termos e requisitos solicitados
+> Discentes: Julio Guzzo Kuster, Andrew Bertelli, Felipe Hyczy e Josué Farah
+> Docente: Professor Mestre. Giovane Galvão.
 
 ---
+## 💼 Responsabilidades e Esclarecimentos Requisitados
+- O trabalho foi dividido tendo EM VISTA todas as responsábilidades e divisões de trabalhos do grupo no bimestre, seminários, apresentações e etc, e de acordo com os domínios e tempos de cada integrante.
 
+-Josué Farah: foi responsável pelo vesrsionamento via git, auxílio aos outros membros no uso do git, revisão das entregas e dos readmes enviados, sendo responsável pela criação dos forms com rook form e zod e revisão dos mesmos a partir de D2. Arquitetou a Mock API. 
+
+-Julio Guzzo: idealizador do SaaS, criou a ideia, fez o protótipo de alta fidelidade, projetou os primeiros formulários com zod que depois foram revisados, idealizou toda a dashboard e organizou o grupo, deu as ideias para a aplicação e auxiliou na estilização, foi responsável pela primeira entrega
+
+Felipe Hyczy: estilizou e construiu todo o layout/dashboard e seus componentes junto com o Julio, pesquisou a documentação typescript, construiu a dashboard e o layout, foi responsável pela segunda entrega, sendo o arquiteto do ui kit.
+
+Andrew Bertelli: video-gravou a apresentação, arquitetou a compilação e revisão da ultima entrega, foi o responsável por apoiar o grupo em diversas tarefas, sendo principalmente responsável em todas as entregas pelas pesquisas, cleancode e revisões gerais.
+
+Foi utilizado o padrão internacional de commits para o presente trabalho (Conventional Commits 1.0.0)
+Os maiories desafios foram a comunicação em grupo para realização do trabalho, a habituação ao uso de TERMOS TÉCNICOS e o COSTUME ao uso do NEXT-JS e suas ferramentas, sendo muito fácil a confusão com a declaração de classes deste framework e suas ferramentas com o laravel e PHP. Acreditamos ter tido grande evolução do grupo em: versionamento, uso do terminal de modo geral e lógica de programação.
+
+---
 ## 🎯 Problema que o SaaS resolve
 
-Investidores de criptomoedas hoje precisam acessar múltiplas plataformas para acompanhar preços, ler notícias e organizar seus portfólios. O **Ativos International** centraliza tudo isso em uma interface limpa, responsiva e rápida.
+Investidores de criptomoedas hoje precisam acessar múltiplas plataformas para acompanhar preços, ler notícias e organizar seus portfólios. O Ativos International centraliza tudo isso em uma interface limpa, responsiva e rápida.
 
-**Dores resolvidas:**
+**O que resolvemos:**
 - Dados espalhados em 5+ plataformas diferentes
 - Interfaces pesadas e repletas de anúncios
 - Falta de organização de carteiras e portfólios
 - Dificuldade de acompanhar notícias relevantes do mercado
-
----
-
-## 🔗 Protótipo
-
-> **[Ver protótipo no Figma →](#)** *(substitua pelo link real)*
-
 ---
 
 ## 🚀 Como rodar
-
 ### Pré-requisitos: Node.js 18+
 
 ```bash
@@ -130,18 +138,3 @@ app/
 
 ---
 
-## ✅ Criterios Atendidos
-
-**Arquitetura:** App Router + grupos de rota `(main)` e `(auth)` com layouts independentes. Props tipadas com interfaces em todos os componentes. Children pattern em `Card`, `Button`, `NavItem`.
-
-**Qualidade de Codigo:** Zero `any`. `forwardRef` + `displayName` no Input. Schemas isolados em `lib/`. Funcoes auxiliares puras.
-
-**UI/UX:** Responsivo mobile-first. Header sticky com blur. Animacoes de entrada com stagger. Empty state na pagina de carteiras. Active state no NavItem.
-
-**Engenharia de Formularios:** `mode: "onTouched"`, `noValidate`, mensagens em portugues, `.refine()` cross-field, `z.literal(true)` para checkbox, reset apos submit.
-
----
-
-## 📄 Licença
-
-MIT © Ativos International
