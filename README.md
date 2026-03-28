@@ -14,7 +14,7 @@
 
 Felipe Hyczy: estilizou e construiu todo o layout/dashboard e seus componentes junto com o Julio, pesquisou a documentação typescript, construiu a dashboard e o layout, foi responsável pela segunda entrega, sendo o arquiteto do ui kit.
 
-Andrew Bertelli: video-gravou a apresentação, arquitetou a compilação e revisão da ultima entrega, foi o responsável por apoiar o grupo em diversas tarefas, sendo principalmente responsável em todas as entregas pelas pesquisas, cleancode e revisões gerais.
+Andrew Bertelli:  arquitetou a compilação e revisão da ultima entrega, foi o responsável por apoiar o grupo em diversas tarefas, sendo principalmente responsável em todas as entregas pelas pesquisas, cleancode e revisões gerais.
 
 Foi utilizado o padrão internacional de commits para o presente trabalho (Conventional Commits 1.0.0)
 Os maiories desafios foram a comunicação em grupo para realização do trabalho, a habituação ao uso de TERMOS TÉCNICOS e o COSTUME ao uso do NEXT-JS e suas ferramentas, sendo muito fácil a confusão com a declaração de classes deste framework e suas ferramentas com o laravel e PHP. Acreditamos ter tido grande evolução do grupo em: versionamento, uso do terminal de modo geral e lógica de programação.
