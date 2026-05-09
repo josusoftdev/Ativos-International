@@ -2,9 +2,6 @@
 
 > **Entrega D4 — Repositório do Back-end**  
 > Migrações do banco de dados, documentação Swagger ativa, Modelagem DER e implementação inicial com NestJS + Prisma ORM  
-> **Discentes:** Julio Guzzo Kuster, Andrew Bertelli, Felipe Hyczy e Josué Farah  
-> **Docente:** Prof. Mestre. Giovane Galvão
-
 ---
 
 ## 🎯 Sobre esta entrega
@@ -281,11 +278,3 @@ npm run lint             # Verificar código
 
 ---
 
-## 👥 Responsabilidades D4
-
-- **Josué Farah** — Arquitetura NestJS, módulos, guards e versionamento
-- **Andrew Bertelli** — Revisão geral, clean code e documentação
-- **Julio Guzzo Kuster** — Modelagem do banco e definição de regras de negócio
-- **Felipe Hyczy** — Integração com schema Prisma e migrations
-
-Padrão de commits: **Conventional Commits 1.0.0**
