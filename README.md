@@ -1,23 +1,9 @@
-# 🪙 Ativos International - Entrega Parcial D3. 
+# 🪙 Ativos International - D4
 > Dashboard SaaS de criptomoedas 
-> Deliver da "The Front-End Experience" de acordo com os termos e requisitos solicitados
-> Discentes: Julio Guzzo Kuster, Andrew Bertelli, Felipe Hyczy e Josué Farah
-> Docente: Professor Mestre. Giovane Galvão.
+> Deliver 4 Backend!
+> Discentes: Andrew Bertelli, Felipe Hyczy e Josué Farah
+> Docente: Professora Isabela Taques Vitek
 
----
-## 💼 Responsabilidades e Esclarecimentos Requisitados
-- O trabalho foi dividido tendo EM VISTA todas as responsábilidades e divisões de trabalhos do grupo no bimestre, seminários, apresentações e etc, e de acordo com os domínios e tempos de cada integrante.
-
--Josué Farah: foi responsável pelo vesrsionamento via git, auxílio aos outros membros no uso do git, revisão das entregas e dos readmes enviados, sendo responsável pela criação dos forms com rook form e zod e revisão dos mesmos a partir de D2. Arquitetou a Mock API. 
-
--Julio Guzzo: idealizador do SaaS, criou a ideia, fez o protótipo de alta fidelidade, projetou os primeiros formulários com zod que depois foram revisados, idealizou toda a dashboard e organizou o grupo, deu as ideias para a aplicação e auxiliou na estilização, foi responsável pela primeira entrega
-
-Felipe Hyczy: estilizou e construiu todo o layout/dashboard e seus componentes junto com o Julio, pesquisou a documentação typescript, construiu a dashboard e o layout, foi responsável pela segunda entrega, sendo o arquiteto do ui kit.
-
-Andrew Bertelli:  arquitetou a compilação e revisão da ultima entrega, foi o responsável por apoiar o grupo em diversas tarefas, sendo principalmente responsável em todas as entregas pelas pesquisas, cleancode e revisões gerais.
-
-Foi utilizado o padrão internacional de commits para o presente trabalho (Conventional Commits 1.0.0)
-Os maiories desafios foram a comunicação em grupo para realização do trabalho, a habituação ao uso de TERMOS TÉCNICOS e o COSTUME ao uso do NEXT-JS e suas ferramentas, sendo muito fácil a confusão com a declaração de classes deste framework e suas ferramentas com o laravel e PHP. Acreditamos ter tido grande evolução do grupo em: versionamento, uso do terminal de modo geral e lógica de programação.
 
 ---
 ## 🎯 Problema que o SaaS resolve
@@ -37,22 +23,85 @@ Investidores de criptomoedas hoje precisam acessar múltiplas plataformas para a
 ```bash
 git clone https://github.com/seu-usuario/ativos-international.git
 cd ativos-international
-npm install
-npm run dev
 ```
 
-Acesse http://localhost:3000
-
+### Backend (NestJS + Prisma)
 ```bash
-npm run dev      # Desenvolvimento
-npm run build    # Build de produção
-npm run lint     # Zero erros esperado
+cd backend
+npm install
+npm run db:generate    # Gera Prisma Client
+npm run db:migrate     # Executa migrations
+npm run start:dev      # Inicia servidor em http://localhost:3001
+```
+
+### Frontend (Next.js)
+```bash
+cd frontend
+npm install
+npm run dev            # Inicia em http://localhost:3000
+```
+
+### Comandos úteis
+```bash
+# Backend
+cd backend
+npm run build          # Build de produção
+npm run lint           # ESLint
+npm run db:studio      # Prisma Studio (GUI)
+npm run db:seed        # Populate database
+
+# Frontend
+cd frontend
+npm run build          # Build de produção
+npm run lint           # ESLint
 ```
 
 ---
 
 ## 🏗️ Arquitetura
 
+### Backend (NestJS + Prisma)
+```
+src/
+├── main.ts                       # Entry point, porta 3001
+├── app.module.ts                 # Root module
+├── auth/                         # Autenticacao JWT
+│   ├── auth.controller.ts
+│   ├── auth.service.ts
+│   ├── auth.module.ts
+│   ├── dto/
+│   │   └── auth.dto.ts
+│   ├── guards/
+│   │   └── jwt-auth.guard.ts
+│   └── strategies/
+│       └── jwt.strategy.ts
+├── users/                        # Gerenciamento de usuarios
+│   ├── users.controller.ts
+│   ├── users.service.ts
+│   ├── users.module.ts
+│   └── dto/
+│       └── update-user.dto.ts
+├── wallets/                      # Gerenciamento de carteiras
+│   ├── wallets.controller.ts
+│   ├── wallets.service.ts
+│   ├── wallets.module.ts
+│   └── dto/
+│       └── wallet.dto.ts
+├── plans/                        # Planos e subscricoes
+│   ├── plans.controller.ts
+│   ├── plans.service.ts
+│   └── plans.module.ts
+└── prisma/                       # Database
+    ├── prisma.service.ts
+    ├── prisma.module.ts
+    └── schema.prisma
+
+prisma/
+├── schema.prisma                 # Modelo de dados
+└── migrations/                   # Historico de migrations
+```
+
+### Frontend (Next.js + React Hook Form + Zod)
 ```
 app/
 ├── layout.tsx                    # Root layout (fonte DM Sans, metadata global)
@@ -68,13 +117,13 @@ app/
 │   └── register/page.tsx
 ├── components/
 │   ├── ui/                       # UI Kit (7 componentes)
-│   │   ├── button.tsx            # 5 variantes + loading state
-│   │   ├── input.tsx             # forwardRef, label, error, leftIcon
-│   │   ├── badge.tsx             # 6 variantes de status
-│   │   ├── card.tsx              # Card + CardHeader
-│   │   ├── stat-card.tsx         # Metrica com trend indicator
-│   │   ├── nav-item.tsx          # Active state via usePathname
-│   │   └── logo.tsx              # 3 tamanhos
+│   │   ├── button.tsx
+│   │   ├── input.tsx
+│   │   ├── badge.tsx
+│   │   ├── card.tsx
+│   │   ├── stat-card.tsx
+│   │   ├── nav-item.tsx
+│   │   └── logo.tsx
 │   ├── layout/                   # Componentes de dominio
 │   │   ├── header.tsx
 │   │   ├── crypto-card.tsx
@@ -125,10 +174,23 @@ app/
 
 ## 🔑 Tecnologias
 
+### Backend
+| Tecnologia | Versao | Uso |
+|---|---|---|
+| NestJS | 10.0 | Framework backend modular |
+| Prisma | 5.21 | ORM para banco de dados |
+| PostgreSQL | - | Banco de dados relacional |
+| JWT | 10.2 | Autenticacao segura |
+| Passport | 0.7 | Estrategias de autenticacao |
+| Bcrypt | 5.1 | Hash de senhas |
+| Swagger | 7.4 | Documentacao da API |
+| TypeScript | 5 | Tipagem estrita |
+
+### Frontend
 | Tecnologia | Versao | Uso |
 |---|---|---|
 | Next.js | 16.2 | App Router, Layouts, SSR |
-| React | 19 | UI, estado, hooks |
+| React | 19.2 | UI, estado, hooks |
 | TypeScript | 5 | Tipagem estrita (sem `any`) |
 | Tailwind CSS | 4 | Estilos utilitarios |
 | React Hook Form | 7.54 | Gerenciamento de formularios |
