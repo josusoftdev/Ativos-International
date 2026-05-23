@@ -19,6 +19,8 @@ Entrega D5: autenticacao JWT, middleware de seguranca, guards, DTOs de validacao
   - excluir carteira.
 - Estrutura do Next.js corrigida para `frontend/app`.
 
+Andrew, Josué, Felipe Hyczy.
+
 ## Como rodar
 
 ### Pre-requisitos
