@@ -1,52 +1,64 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Transform, type TransformFnParams } from 'class-transformer';
 import {
   IsEmail,
   IsNotEmpty,
   IsString,
-  MinLength,
-  MaxLength,
   Matches,
+  MaxLength,
+  MinLength,
 } from 'class-validator';
 
-// ── Login DTO ──────────────────────────────────────────────────────────────
+const trimString = ({ value }: TransformFnParams) =>
+  typeof value === 'string' ? value.trim() : value;
+
+const normalizeEmail = ({ value }: TransformFnParams) =>
+  typeof value === 'string' ? value.trim().toLowerCase() : value;
+
 export class LoginDto {
-  @ApiProperty({ example: 'usuario@email.com', description: 'Email do usuário' })
-  @IsEmail({}, { message: 'Digite um email válido' })
+  @ApiProperty({ example: 'usuario@email.com', description: 'Email do usuario' })
+  @Transform(normalizeEmail)
+  @IsEmail({}, { message: 'Digite um email valido' })
   @IsNotEmpty()
   email: string;
 
-  @ApiProperty({ example: 'MinhaS3nha!', description: 'Senha (mín. 6 caracteres)' })
+  @ApiProperty({ example: 'MinhaS3nha!', description: 'Senha do usuario' })
   @IsString()
-  @MinLength(6, { message: 'A senha deve ter no mínimo 6 caracteres' })
+  @MinLength(6, { message: 'A senha deve ter no minimo 6 caracteres' })
   password: string;
 }
 
-// ── Register DTO ───────────────────────────────────────────────────────────
 export class RegisterDto {
-  @ApiProperty({ example: 'João Silva', description: 'Nome completo (somente letras, 3–60 chars)' })
+  @ApiProperty({
+    example: 'Joao Silva',
+    description: 'Nome completo, de 3 a 60 caracteres',
+  })
+  @Transform(trimString)
   @IsString()
-  @MinLength(3, { message: 'O nome deve ter no mínimo 3 caracteres' })
-  @MaxLength(60, { message: 'O nome deve ter no máximo 60 caracteres' })
-  @Matches(/^[A-Za-zÀ-ÖØ-öø-ÿ\s]+$/, { message: 'O nome deve conter apenas letras' })
+  @MinLength(3, { message: 'O nome deve ter no minimo 3 caracteres' })
+  @MaxLength(60, { message: 'O nome deve ter no maximo 60 caracteres' })
+  @Matches(/^[A-Za-zÀ-ÖØ-öø-ÿ\s]+$/, {
+    message: 'O nome deve conter apenas letras',
+  })
   name: string;
 
   @ApiProperty({ example: 'joao@email.com' })
-  @IsEmail({}, { message: 'Digite um email válido' })
+  @Transform(normalizeEmail)
+  @IsEmail({}, { message: 'Digite um email valido' })
   @IsNotEmpty()
   email: string;
 
   @ApiProperty({
     example: 'MinhaS3nha!',
-    description: 'Mín. 8 chars, ao menos 1 maiúscula e 1 número',
+    description: 'Minimo 8 caracteres, 1 letra maiuscula e 1 numero',
   })
   @IsString()
-  @MinLength(8, { message: 'A senha deve ter no mínimo 8 caracteres' })
-  @Matches(/[A-Z]/, { message: 'Deve conter ao menos uma letra maiúscula' })
-  @Matches(/[0-9]/, { message: 'Deve conter ao menos um número' })
+  @MinLength(8, { message: 'A senha deve ter no minimo 8 caracteres' })
+  @Matches(/[A-Z]/, { message: 'Deve conter ao menos uma letra maiuscula' })
+  @Matches(/[0-9]/, { message: 'Deve conter ao menos um numero' })
   password: string;
 }
 
-// ── Refresh Token DTO ──────────────────────────────────────────────────────
 export class RefreshTokenDto {
   @ApiProperty({ description: 'Refresh token JWT' })
   @IsString()

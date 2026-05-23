@@ -1,11 +1,12 @@
 import {
-  Injectable,
   ConflictException,
+  Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
+import { randomUUID } from 'crypto';
 import { PrismaService } from '../prisma/prisma.service';
 import { LoginDto, RegisterDto } from './dto/auth.dto';
 
@@ -17,19 +18,16 @@ export class AuthService {
     private config: ConfigService,
   ) {}
 
-  // ── Registro ───────────────────────────────────────────────────────────────
   async register(dto: RegisterDto) {
     const exists = await this.prisma.user.findUnique({
       where: { email: dto.email },
     });
 
     if (exists) {
-      throw new ConflictException('Este email já está em uso');
+      throw new ConflictException('Este email ja esta em uso');
     }
 
     const passwordHash = await bcrypt.hash(dto.password, 10);
-
-    // Busca plano Starter (gratuito) para novos usuários
     const starterPlan = await this.prisma.plan.findFirst({
       where: { isFree: true },
     });
@@ -48,25 +46,29 @@ export class AuthService {
     return { user, ...tokens };
   }
 
-  // ── Login ──────────────────────────────────────────────────────────────────
   async login(dto: LoginDto) {
     const user = await this.prisma.user.findUnique({
       where: { email: dto.email },
     });
 
-    if (!user) throw new UnauthorizedException('Email ou senha inválidos');
+    if (!user) {
+      throw new UnauthorizedException('Email ou senha invalidos');
+    }
 
     const passwordMatch = await bcrypt.compare(dto.password, user.passwordHash);
-    if (!passwordMatch) throw new UnauthorizedException('Email ou senha inválidos');
+
+    if (!passwordMatch) {
+      throw new UnauthorizedException('Email ou senha invalidos');
+    }
 
     const tokens = await this.generateTokens(user.id, user.email);
+
     return {
       user: { id: user.id, name: user.name, email: user.email },
       ...tokens,
     };
   }
 
-  // ── Refresh Token ──────────────────────────────────────────────────────────
   async refreshTokens(refreshToken: string) {
     const stored = await this.prisma.refreshToken.findUnique({
       where: { token: refreshToken },
@@ -74,39 +76,44 @@ export class AuthService {
     });
 
     if (!stored || stored.expiresAt < new Date()) {
-      throw new UnauthorizedException('Refresh token inválido ou expirado');
+      throw new UnauthorizedException('Refresh token invalido ou expirado');
     }
 
-    // Rotação de token: remove o antigo e gera novo par
     await this.prisma.refreshToken.delete({ where: { id: stored.id } });
 
     return this.generateTokens(stored.user.id, stored.user.email);
   }
 
-  // ── Logout ─────────────────────────────────────────────────────────────────
   async logout(userId: string) {
     await this.prisma.refreshToken.deleteMany({ where: { userId } });
     return { message: 'Logout realizado com sucesso' };
   }
 
-  // ── Helpers ────────────────────────────────────────────────────────────────
   private async generateTokens(userId: string, email: string) {
     const payload = { sub: userId, email };
     const secret = this.config.get<string>('JWT_SECRET') || 'dev-secret';
+    const accessTokenExpiresIn =
+      this.config.get<string>('JWT_EXPIRES_IN') || '15m';
 
     const accessToken = this.jwt.sign(payload, {
       secret,
-      expiresIn: this.config.get('JWT_EXPIRES_IN') || '15m',
+      expiresIn: accessTokenExpiresIn,
     });
 
-    const refreshToken = this.jwt.sign(payload, {
-      secret,
-      expiresIn: '7d',
-    });
+    const refreshToken = this.jwt.sign(
+      { ...payload, jti: randomUUID() },
+      {
+        secret,
+        expiresIn: '7d',
+      },
+    );
 
-    // Persiste o refresh token
     const expiresAt = new Date();
     expiresAt.setDate(expiresAt.getDate() + 7);
+
+    await this.prisma.refreshToken.deleteMany({
+      where: { userId, expiresAt: { lt: new Date() } },
+    });
 
     await this.prisma.refreshToken.create({
       data: { token: refreshToken, userId, expiresAt },

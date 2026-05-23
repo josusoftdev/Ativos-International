@@ -8,6 +8,7 @@ import {
 import { AuthService } from './auth.service';
 import { LoginDto, RegisterDto, RefreshTokenDto } from './dto/auth.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { AuthenticatedRequest } from './types/authenticated-request';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -48,7 +49,7 @@ export class AuthController {
   @ApiBearerAuth('access-token')
   @ApiOperation({ summary: 'Encerrar sessão do usuário autenticado' })
   @ApiResponse({ status: 200, description: 'Logout realizado' })
-  logout(@Request() req: any) {
+  logout(@Request() req: AuthenticatedRequest) {
     return this.authService.logout(req.user.id);
   }
 }

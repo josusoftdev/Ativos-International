@@ -1,51 +1,49 @@
-import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
-import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import { NestFactory } from '@nestjs/core';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import helmet from 'helmet';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  // ── Prefixo global de API ──────────────────────────────────────────────────
   app.setGlobalPrefix('api');
+  app.use(helmet());
 
-  // ── Validação global (class-validator) ────────────────────────────────────
   app.useGlobalPipes(
     new ValidationPipe({
-      whitelist: true,         // Remove campos não declarados no DTO
+      whitelist: true,
       forbidNonWhitelisted: true,
-      transform: true,         // Converte tipos automaticamente
+      transform: true,
+      transformOptions: { enableImplicitConversion: true },
     }),
   );
 
-  // ── CORS ──────────────────────────────────────────────────────────────────
   app.enableCors({
     origin: process.env.FRONTEND_URL || 'http://localhost:3000',
     credentials: true,
   });
 
-  // ── Swagger ───────────────────────────────────────────────────────────────
   const config = new DocumentBuilder()
     .setTitle('Ativos International API')
     .setDescription(
       `
-## 🪙 Ativos International — Back-end API (D4)
+Ativos International - Back-end API (D5)
 
-Dashboard SaaS de criptomoedas.  
-Autenticação via **JWT Bearer Token**.
+Dashboard SaaS de criptomoedas com autenticacao JWT, guards, DTOs validados e primeiras rotas CRUD integradas ao front-end.
 
-### Módulos disponíveis
-- **Auth** — Login, registro e refresh de tokens
-- **Users** — Perfil do usuário autenticado
-- **Wallets** — Gerenciamento de carteiras e ativos
-- **Plans** — Planos e assinaturas disponíveis
+Modulos disponiveis:
+- Auth: login, cadastro, refresh token e logout
+- Users: perfil do usuario autenticado
+- Wallets: CRUD de carteiras e gerenciamento de ativos
+- Plans: planos disponiveis
       `.trim(),
     )
     .setVersion('1.0.0')
-    .addTag('auth', 'Autenticação e sessão')
-    .addTag('users', 'Perfil do usuário')
+    .addTag('auth', 'Autenticacao e sessao')
+    .addTag('users', 'Perfil do usuario')
     .addTag('wallets', 'Carteiras de criptomoedas')
-    .addTag('plans', 'Planos e preços')
+    .addTag('plans', 'Planos e precos')
     .addBearerAuth(
       { type: 'http', scheme: 'bearer', bearerFormat: 'JWT' },
       'access-token',
@@ -63,8 +61,8 @@ Autenticação via **JWT Bearer Token**.
   const port = process.env.PORT || 3001;
   await app.listen(port);
 
-  console.log(`\n🚀 API rodando em: http://localhost:${port}/api`);
-  console.log(`📄 Swagger UI em:  http://localhost:${port}/api/docs\n`);
+  console.log(`API rodando em: http://localhost:${port}/api`);
+  console.log(`Swagger UI em:  http://localhost:${port}/api/docs`);
 }
 
 bootstrap();

@@ -8,7 +8,7 @@ import { Input } from "@/app/components/ui/input";
 import { Button } from "@/app/components/ui/button";
 
 interface NewWalletFormProps {
-  onCreate: (name: string) => void;
+  onCreate: (name: string) => boolean | Promise<boolean>;
 }
 
 export function NewWalletForm({ onCreate }: NewWalletFormProps) {
@@ -22,9 +22,12 @@ export function NewWalletForm({ onCreate }: NewWalletFormProps) {
     mode: "onTouched",
   });
 
-  const onSubmit = (data: NewWalletFormData) => {
-    onCreate(data.name);
-    reset();
+  const onSubmit = async (data: NewWalletFormData) => {
+    const created = await onCreate(data.name);
+
+    if (created) {
+      reset();
+    }
   };
 
   return (

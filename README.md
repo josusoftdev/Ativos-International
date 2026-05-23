@@ -1,202 +1,165 @@
-# 🪙 Ativos International - D4
-> Dashboard SaaS de criptomoedas 
-> Deliver 4 Backend!
-> Discentes: Andrew Bertelli, Felipe Hyczy e Josué Farah
-> Docente: Professora Isabela Taques Vitek
+# Ativos International - D5
 
+Dashboard SaaS de criptomoedas com front-end Next.js e back-end NestJS.  
+Entrega D5: autenticacao JWT, middleware de seguranca, guards, DTOs de validacao e integracao real do fluxo Login/Cadastro e CRUD inicial de carteiras entre front e back.
 
----
-## 🎯 Problema que o SaaS resolve
+## O que foi entregue no D5
 
-Investidores de criptomoedas hoje precisam acessar múltiplas plataformas para acompanhar preços, ler notícias e organizar seus portfólios. O Ativos International centraliza tudo isso em uma interface limpa, responsiva e rápida.
+- Autenticacao JWT com `accessToken` e `refreshToken`.
+- Cadastro, login, refresh e logout conectados ao front-end.
+- Sessao salva no front-end e usada nas chamadas protegidas.
+- Guard JWT protegendo `users` e `wallets`.
+- Middleware de seguranca com `helmet`, CORS e `ValidationPipe` global.
+- DTOs com validacao e normalizacao de entrada no back-end.
+- Validacao de formularios no front-end com React Hook Form + Zod.
+- CRUD inicial de carteiras integrado:
+  - listar carteiras;
+  - criar carteira;
+  - renomear carteira;
+  - excluir carteira.
+- Estrutura do Next.js corrigida para `frontend/app`.
 
-**O que resolvemos:**
-- Dados espalhados em 5+ plataformas diferentes
-- Interfaces pesadas e repletas de anúncios
-- Falta de organização de carteiras e portfólios
-- Dificuldade de acompanhar notícias relevantes do mercado
----
+## Como rodar
 
-## 🚀 Como rodar
-### Pré-requisitos: Node.js 18+
+### Pre-requisitos
 
-```bash
-git clone https://github.com/seu-usuario/ativos-international.git
-cd ativos-international
-```
+- Node.js 18+
+- PostgreSQL 14+
 
-### Backend (NestJS + Prisma)
+### Back-end
+
 ```bash
 cd backend
 npm install
-npm run db:generate    # Gera Prisma Client
-npm run db:migrate     # Executa migrations
-npm run start:dev      # Inicia servidor em http://localhost:3001
+cp .env.example .env
+npm run db:generate
+npm run db:migrate
+npm run start:dev
 ```
 
-### Frontend (Next.js)
+API: `http://localhost:3001/api`  
+Swagger: `http://localhost:3001/api/docs`
+
+### Front-end
+
 ```bash
 cd frontend
 npm install
-npm run dev            # Inicia em http://localhost:3000
+cp .env.example .env.local
+npm run dev
 ```
 
-### Comandos úteis
+App: `http://localhost:3000`
+
+`frontend/.env.example`:
+
+```env
+NEXT_PUBLIC_API_URL=http://localhost:3001/api
+```
+
+## Variaveis do back-end
+
+`backend/.env.example`:
+
+```env
+DATABASE_URL="postgresql://postgres:postgres@localhost:5432/ativos_international"
+JWT_SECRET="troque-esse-valor-em-producao-por-algo-aleatorio-256bits"
+JWT_EXPIRES_IN="15m"
+PORT=3001
+FRONTEND_URL="http://localhost:3000"
+NODE_ENV="development"
+```
+
+## Fluxo de autenticacao
+
+1. O usuario cria conta em `/register` ou entra em `/login`.
+2. O front envia os dados para `/api/auth/register` ou `/api/auth/login`.
+3. A API valida os DTOs, cria/verifica o usuario e retorna `accessToken`, `refreshToken` e `user`.
+4. O front salva a sessao em `localStorage`.
+5. Chamadas protegidas usam `Authorization: Bearer <accessToken>`.
+6. Se o access token expirar, o front tenta renovar em `/api/auth/refresh`.
+7. Logout chama `/api/auth/logout` e limpa a sessao local.
+
+## Endpoints principais
+
+### Auth
+
+| Metodo | Rota | Acesso | Descricao |
+|---|---|---|---|
+| `POST` | `/api/auth/register` | Publico | Cadastra usuario e retorna tokens |
+| `POST` | `/api/auth/login` | Publico | Autentica usuario e retorna tokens |
+| `POST` | `/api/auth/refresh` | Publico | Renova tokens via refresh token |
+| `POST` | `/api/auth/logout` | Protegido | Encerra a sessao |
+
+### Users
+
+| Metodo | Rota | Acesso | Descricao |
+|---|---|---|---|
+| `GET` | `/api/users/me` | Protegido | Perfil do usuario autenticado |
+| `PATCH` | `/api/users/me` | Protegido | Atualiza nome/avatar |
+| `DELETE` | `/api/users/me` | Protegido | Exclui a conta |
+
+### Wallets
+
+| Metodo | Rota | Acesso | Descricao |
+|---|---|---|---|
+| `GET` | `/api/wallets` | Protegido | Lista carteiras do usuario |
+| `GET` | `/api/wallets/:id` | Protegido | Detalha uma carteira |
+| `POST` | `/api/wallets` | Protegido | Cria carteira |
+| `PATCH` | `/api/wallets/:id` | Protegido | Renomeia carteira |
+| `DELETE` | `/api/wallets/:id` | Protegido | Exclui carteira |
+| `PUT` | `/api/wallets/:id/assets` | Protegido | Adiciona/atualiza ativo |
+| `DELETE` | `/api/wallets/:id/assets/:symbol` | Protegido | Remove ativo |
+
+### Plans
+
+| Metodo | Rota | Acesso | Descricao |
+|---|---|---|---|
+| `GET` | `/api/plans` | Publico | Lista planos |
+| `GET` | `/api/plans/:id` | Publico | Detalha um plano |
+
+## Arquitetura
+
+```text
+backend/
+  src/
+    auth/       JWT, DTOs, controller, service, guard e strategy
+    users/      perfil do usuario autenticado
+    wallets/    CRUD de carteiras e ativos
+    plans/      planos publicos
+    prisma/     PrismaService e PrismaModule
+  prisma/
+    schema.prisma
+    migrations/
+
+frontend/
+  app/
+    (auth)/     login e cadastro
+    (main)/     dashboard, carteiras, planos e sobre
+    components/ UI, layout e formularios
+    lib/        api.ts, schemas.ts e dados de mercado
+  public/
+```
+
+## Scripts uteis
+
 ```bash
-# Backend
-cd backend
-npm run build          # Build de produção
-npm run lint           # ESLint
-npm run db:studio      # Prisma Studio (GUI)
-npm run db:seed        # Populate database
+# Back-end
+npm run start:dev
+npm run build
+npm run db:generate
+npm run db:migrate
+npm run db:studio
 
-# Frontend
-cd frontend
-npm run build          # Build de produção
-npm run lint           # ESLint
+# Front-end
+npm run dev
+npm run build
+npm run lint
 ```
 
----
+## Tecnologias
 
-## 🏗️ Arquitetura
-
-### Backend (NestJS + Prisma)
-```
-src/
-├── main.ts                       # Entry point, porta 3001
-├── app.module.ts                 # Root module
-├── auth/                         # Autenticacao JWT
-│   ├── auth.controller.ts
-│   ├── auth.service.ts
-│   ├── auth.module.ts
-│   ├── dto/
-│   │   └── auth.dto.ts
-│   ├── guards/
-│   │   └── jwt-auth.guard.ts
-│   └── strategies/
-│       └── jwt.strategy.ts
-├── users/                        # Gerenciamento de usuarios
-│   ├── users.controller.ts
-│   ├── users.service.ts
-│   ├── users.module.ts
-│   └── dto/
-│       └── update-user.dto.ts
-├── wallets/                      # Gerenciamento de carteiras
-│   ├── wallets.controller.ts
-│   ├── wallets.service.ts
-│   ├── wallets.module.ts
-│   └── dto/
-│       └── wallet.dto.ts
-├── plans/                        # Planos e subscricoes
-│   ├── plans.controller.ts
-│   ├── plans.service.ts
-│   └── plans.module.ts
-└── prisma/                       # Database
-    ├── prisma.service.ts
-    ├── prisma.module.ts
-    └── schema.prisma
-
-prisma/
-├── schema.prisma                 # Modelo de dados
-└── migrations/                   # Historico de migrations
-```
-
-### Frontend (Next.js + React Hook Form + Zod)
-```
-app/
-├── layout.tsx                    # Root layout (fonte DM Sans, metadata global)
-├── (main)/                       # Grupo de rotas com Header
-│   ├── layout.tsx                # Layout com Header sticky
-│   ├── page.tsx                  # Dashboard: mercado + noticias
-│   ├── wallets/page.tsx          # Gestao de carteiras
-│   ├── plans/page.tsx            # Planos e precos
-│   └── about/page.tsx            # Sobre + FAQ + Contato
-├── (auth)/                       # Grupo de rotas autenticacao
-│   ├── layout.tsx                # Layout centrado sem header
-│   ├── login/page.tsx
-│   └── register/page.tsx
-├── components/
-│   ├── ui/                       # UI Kit (7 componentes)
-│   │   ├── button.tsx
-│   │   ├── input.tsx
-│   │   ├── badge.tsx
-│   │   ├── card.tsx
-│   │   ├── stat-card.tsx
-│   │   ├── nav-item.tsx
-│   │   └── logo.tsx
-│   ├── layout/                   # Componentes de dominio
-│   │   ├── header.tsx
-│   │   ├── crypto-card.tsx
-│   │   ├── news-card.tsx
-│   │   ├── wallet-card.tsx
-│   │   └── plan-card.tsx
-│   └── forms/                    # Formularios RHF + Zod
-│       ├── login-form.tsx
-│       ├── register-form.tsx
-│       └── new-wallet-form.tsx
-└── lib/
-    ├── schemas.ts                # Schemas Zod
-    └── mock-api.ts               # Mock API com delay simulado
-```
-
----
-
-## 🧩 UI Kit — 7 Componentes Reutilizáveis
-
-| Componente | Props principais | Descricao |
-|---|---|---|
-| `Button` | `variant`, `size`, `loading`, `href` | Botao com 5 variantes e spinner |
-| `Input` | `label`, `error`, `hint`, `leftIcon` | Input com forwardRef e estados de erro |
-| `Badge` | `variant` | 6 variantes de status colorido |
-| `Card` | `glow`, `as` | Container com efeito hover e tag semantica |
-| `StatCard` | `label`, `value`, `trend`, `icon` | Metrica com indicador de tendencia |
-| `NavItem` | `href` | Link com active state automatico |
-| `Logo` | `size` | Logo em 3 tamanhos |
-
----
-
-## 📋 Formulários com React Hook Form + Zod
-
-### LoginForm
-- Validacao de email (formato) e senha minimo 6 chars
-- Show/hide password, loading state, feedback de API (mock)
-
-### RegisterForm
-- Nome: letras apenas, 3-60 chars
-- Senha: 8+ chars, maiuscula + numero obrigatorios
-- Indicador de forca da senha (fraca/razoavel/boa/forte)
-- Confirmacao com `.refine()`, checkbox com `z.literal(true)`
-
-### NewWalletForm
-- Nome: 2-40 chars, reset apos submit
-
----
-
-## 🔑 Tecnologias
-
-### Backend
-| Tecnologia | Versao | Uso |
-|---|---|---|
-| NestJS | 10.0 | Framework backend modular |
-| Prisma | 5.21 | ORM para banco de dados |
-| PostgreSQL | - | Banco de dados relacional |
-| JWT | 10.2 | Autenticacao segura |
-| Passport | 0.7 | Estrategias de autenticacao |
-| Bcrypt | 5.1 | Hash de senhas |
-| Swagger | 7.4 | Documentacao da API |
-| TypeScript | 5 | Tipagem estrita |
-
-### Frontend
-| Tecnologia | Versao | Uso |
-|---|---|---|
-| Next.js | 16.2 | App Router, Layouts, SSR |
-| React | 19.2 | UI, estado, hooks |
-| TypeScript | 5 | Tipagem estrita (sem `any`) |
-| Tailwind CSS | 4 | Estilos utilitarios |
-| React Hook Form | 7.54 | Gerenciamento de formularios |
-| Zod | 3.24 | Validacao de schemas |
-| @hookform/resolvers | 3.9 | Integracao RHF + Zod |
-| Lucide React | 0.577 | Icones |
-
----
-
+| Camada | Tecnologias |
+|---|---|
+| Back-end | NestJS, Prisma, PostgreSQL, Passport JWT, bcrypt, class-validator, Swagger, helmet |
+| Front-end | Next.js, React, TypeScript, Tailwind CSS, React Hook Form, Zod, Lucide React |

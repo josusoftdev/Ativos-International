@@ -3,6 +3,7 @@ import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagg
 import { UsersService } from './users.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { AuthenticatedRequest } from '../auth/types/authenticated-request';
 
 @ApiTags('users')
 @ApiBearerAuth('access-token')
@@ -15,7 +16,7 @@ export class UsersController {
   @Get('me')
   @ApiOperation({ summary: 'Obter perfil do usuário autenticado' })
   @ApiResponse({ status: 200, description: 'Perfil com plano atual' })
-  getProfile(@Request() req: any) {
+  getProfile(@Request() req: AuthenticatedRequest) {
     return this.usersService.getProfile(req.user.id);
   }
 
@@ -23,7 +24,7 @@ export class UsersController {
   @Patch('me')
   @ApiOperation({ summary: 'Atualizar nome ou avatar do usuário' })
   @ApiResponse({ status: 200, description: 'Perfil atualizado' })
-  updateProfile(@Request() req: any, @Body() dto: UpdateUserDto) {
+  updateProfile(@Request() req: AuthenticatedRequest, @Body() dto: UpdateUserDto) {
     return this.usersService.updateProfile(req.user.id, dto);
   }
 
@@ -31,7 +32,7 @@ export class UsersController {
   @Delete('me')
   @ApiOperation({ summary: 'Excluir conta permanentemente' })
   @ApiResponse({ status: 200, description: 'Conta excluída' })
-  deleteAccount(@Request() req: any) {
+  deleteAccount(@Request() req: AuthenticatedRequest) {
     return this.usersService.deleteAccount(req.user.id);
   }
 }

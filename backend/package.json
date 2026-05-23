@@ -1,8 +1,8 @@
 {
   "name": "ativos-international-api",
   "version": "0.1.0",
-  "description": "Back-end da plataforma Ativos International — NestJS + Prisma + Swagger (D4)",
-  "author": "Julio Guzzo, Andrew Bertelli, Felipe Hyczy, Josué Farah",
+  "description": "Back-end da plataforma Ativos International - NestJS + Prisma + JWT (D5)",
+  "author": "Julio Guzzo, Andrew Bertelli, Felipe Hyczy, Josue Farah",
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
@@ -21,6 +21,7 @@
   },
   "dependencies": {
     "@nestjs/common": "^10.0.0",
+    "@nestjs/config": "^3.3.0",
     "@nestjs/core": "^10.0.0",
     "@nestjs/jwt": "^10.2.0",
     "@nestjs/passport": "^10.0.3",
@@ -30,6 +31,7 @@
     "bcrypt": "^5.1.1",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.1",
+    "helmet": "^7.2.0",
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1",
     "passport-local": "^1.0.0",
@@ -46,8 +48,11 @@
     "@types/node": "^20.3.1",
     "@types/passport-jwt": "^4.0.1",
     "@types/passport-local": "^1.0.38",
+    "eslint": "^10.4.0",
+    "globals": "^17.6.0",
     "prisma": "^5.21.0",
     "ts-node": "^10.9.1",
-    "typescript": "^5.1.3"
+    "typescript": "^5.1.3",
+    "typescript-eslint": "^8.59.4"
   }
 }

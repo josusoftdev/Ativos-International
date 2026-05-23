@@ -1,7 +1,7 @@
 import { CryptoCard } from "@/app/components/layout/crypto-card";
 import { NewsCard } from "@/app/components/layout/news-card";
 import { StatCard } from "@/app/components/ui/stat-card";
-import { MOCK_CRYPTOS, MOCK_NEWS } from "@/app/lib/mock-api";
+import { MARKET_CRYPTOS, MARKET_NEWS } from "@/app/lib/market-data";
 import { TrendingUp, BarChart2, Globe } from "lucide-react";
 
 export default function HomePage() {
@@ -60,7 +60,7 @@ export default function HomePage() {
           <span className="text-xs text-slate-500">Dados em BRL</span>
         </div>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {MOCK_CRYPTOS.map((crypto) => (
+          {MARKET_CRYPTOS.map((crypto) => (
             <CryptoCard
               key={crypto.id}
               iconUrl={crypto.iconUrl}
@@ -89,7 +89,7 @@ export default function HomePage() {
           </div>
         </div>
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {MOCK_NEWS.map((item, index) => (
+          {MARKET_NEWS.map((item, index) => (
             <NewsCard
               key={index}
               title={item.title}

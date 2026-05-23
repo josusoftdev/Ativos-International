@@ -1,15 +1,18 @@
 "use client";
 
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Mail, Lock, Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, Lock, Mail } from "lucide-react";
 import { loginSchema, type LoginFormData } from "@/app/lib/schemas";
-import { mockLogin } from "@/app/lib/mock-api";
+import { getApiErrorMessage, loginUser } from "@/app/lib/api";
 import { Input } from "@/app/components/ui/input";
 import { Button } from "@/app/components/ui/button";
 
 export function LoginForm() {
+  const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
@@ -26,12 +29,14 @@ export function LoginForm() {
   const onSubmit = async (data: LoginFormData) => {
     setApiError(null);
     setSuccessMsg(null);
-    const result = await mockLogin(data.email, data.password);
-    if (!result.success) {
-      setApiError(result.error ?? "Erro ao fazer login.");
-      return;
+
+    try {
+      await loginUser({ email: data.email, password: data.password });
+      setSuccessMsg("Login realizado. Abrindo suas carteiras...");
+      router.push("/wallets");
+    } catch (error) {
+      setApiError(getApiErrorMessage(error));
     }
-    setSuccessMsg(`Bem-vindo de volta! Redirecionando...`);
   };
 
   return (
@@ -40,7 +45,7 @@ export function LoginForm() {
         <div className="mb-8">
           <h1 className="text-2xl font-bold text-slate-100">Entrar na conta</h1>
           <p className="mt-1 text-sm text-slate-400">
-            Acesse o dashboard de criptomoedas
+            Acesse seu dashboard e suas carteiras.
           </p>
         </div>
 
@@ -63,7 +68,7 @@ export function LoginForm() {
             <Input
               label="Senha"
               type={showPassword ? "text" : "password"}
-              placeholder="••••••••"
+              placeholder="********"
               error={errors.password?.message}
               leftIcon={<Lock size={15} />}
               autoComplete="current-password"
@@ -71,9 +76,10 @@ export function LoginForm() {
             />
             <button
               type="button"
-              onClick={() => setShowPassword((v) => !v)}
-              className="absolute right-3 top-9 text-slate-500 hover:text-slate-300 transition-colors"
+              onClick={() => setShowPassword((value) => !value)}
+              className="absolute right-3 top-9 text-slate-500 transition-colors hover:text-slate-300"
               tabIndex={-1}
+              aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"}
             >
               {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
             </button>
@@ -103,19 +109,14 @@ export function LoginForm() {
         </form>
 
         <p className="mt-6 text-center text-sm text-slate-500">
-          Não tem conta?{" "}
-          <a href="/register" className="text-indigo-400 hover:text-indigo-300 font-medium transition-colors">
+          Nao tem conta?{" "}
+          <Link
+            href="/register"
+            className="font-medium text-indigo-400 transition-colors hover:text-indigo-300"
+          >
             Criar conta gratuita
-          </a>
+          </Link>
         </p>
-
-        <div className="mt-4 rounded-lg bg-slate-800/60 p-3">
-          <p className="text-xs text-slate-500 font-medium mb-1">💡 Demo</p>
-          <p className="text-xs text-slate-500">
-            Use qualquer email válido. Para simular erro, use:{" "}
-            <span className="font-mono text-rose-400">erro@teste.com</span>
-          </p>
-        </div>
       </div>
     </div>
   );

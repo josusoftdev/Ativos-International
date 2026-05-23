@@ -1,24 +1,30 @@
 import {
-  Controller,
-  Get,
-  Post,
-  Delete,
-  Put,
   Body,
+  Controller,
+  Delete,
+  Get,
   Param,
-  UseGuards,
+  Patch,
+  Post,
+  Put,
   Request,
+  UseGuards,
 } from '@nestjs/common';
 import {
-  ApiTags,
-  ApiOperation,
-  ApiResponse,
   ApiBearerAuth,
+  ApiOperation,
   ApiParam,
+  ApiResponse,
+  ApiTags,
 } from '@nestjs/swagger';
-import { WalletsService } from './wallets.service';
-import { CreateWalletDto, UpsertAssetDto } from './dto/wallet.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import {
+  CreateWalletDto,
+  UpdateWalletDto,
+  UpsertAssetDto,
+} from './dto/wallet.dto';
+import { WalletsService } from './wallets.service';
+import { AuthenticatedRequest } from '../auth/types/authenticated-request';
 
 @ApiTags('wallets')
 @ApiBearerAuth('access-token')
@@ -27,63 +33,70 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 export class WalletsController {
   constructor(private readonly walletsService: WalletsService) {}
 
-  // GET /api/wallets
   @Get()
-  @ApiOperation({ summary: 'Listar todas as carteiras do usuário autenticado' })
+  @ApiOperation({ summary: 'Listar carteiras do usuario autenticado' })
   @ApiResponse({ status: 200, description: 'Lista de carteiras com ativos' })
-  findAll(@Request() req: any) {
+  findAll(@Request() req: AuthenticatedRequest) {
     return this.walletsService.findAll(req.user.id);
   }
 
-  // GET /api/wallets/:id
   @Get(':id')
-  @ApiOperation({ summary: 'Obter carteira específica por ID' })
+  @ApiOperation({ summary: 'Obter carteira por ID' })
   @ApiParam({ name: 'id', description: 'UUID da carteira' })
-  @ApiResponse({ status: 200, description: 'Carteira com todos os ativos' })
-  @ApiResponse({ status: 404, description: 'Carteira não encontrada' })
-  findOne(@Request() req: any, @Param('id') id: string) {
+  @ApiResponse({ status: 200, description: 'Carteira com ativos' })
+  @ApiResponse({ status: 404, description: 'Carteira nao encontrada' })
+  findOne(@Request() req: AuthenticatedRequest, @Param('id') id: string) {
     return this.walletsService.findOne(req.user.id, id);
   }
 
-  // POST /api/wallets
   @Post()
   @ApiOperation({ summary: 'Criar nova carteira' })
   @ApiResponse({ status: 201, description: 'Carteira criada' })
-  @ApiResponse({ status: 409, description: 'Já existe uma carteira com esse nome' })
-  create(@Request() req: any, @Body() dto: CreateWalletDto) {
+  @ApiResponse({ status: 409, description: 'Ja existe uma carteira com esse nome' })
+  create(@Request() req: AuthenticatedRequest, @Body() dto: CreateWalletDto) {
     return this.walletsService.create(req.user.id, dto);
   }
 
-  // DELETE /api/wallets/:id
-  @Delete(':id')
-  @ApiOperation({ summary: 'Excluir carteira (remove todos os ativos)' })
+  @Patch(':id')
+  @ApiOperation({ summary: 'Renomear carteira' })
   @ApiParam({ name: 'id', description: 'UUID da carteira' })
-  @ApiResponse({ status: 200, description: 'Carteira excluída' })
-  remove(@Request() req: any, @Param('id') id: string) {
+  @ApiResponse({ status: 200, description: 'Carteira atualizada' })
+  @ApiResponse({ status: 409, description: 'Ja existe uma carteira com esse nome' })
+  update(
+    @Request() req: AuthenticatedRequest,
+    @Param('id') id: string,
+    @Body() dto: UpdateWalletDto,
+  ) {
+    return this.walletsService.update(req.user.id, id, dto);
+  }
+
+  @Delete(':id')
+  @ApiOperation({ summary: 'Excluir carteira e seus ativos' })
+  @ApiParam({ name: 'id', description: 'UUID da carteira' })
+  @ApiResponse({ status: 200, description: 'Carteira excluida' })
+  remove(@Request() req: AuthenticatedRequest, @Param('id') id: string) {
     return this.walletsService.remove(req.user.id, id);
   }
 
-  // PUT /api/wallets/:id/assets
   @Put(':id/assets')
-  @ApiOperation({ summary: 'Adicionar ou atualizar ativo na carteira (upsert por símbolo)' })
+  @ApiOperation({ summary: 'Adicionar ou atualizar ativo por simbolo' })
   @ApiParam({ name: 'id', description: 'UUID da carteira' })
   @ApiResponse({ status: 200, description: 'Ativo salvo' })
   upsertAsset(
-    @Request() req: any,
+    @Request() req: AuthenticatedRequest,
     @Param('id') id: string,
     @Body() dto: UpsertAssetDto,
   ) {
     return this.walletsService.upsertAsset(req.user.id, id, dto);
   }
 
-  // DELETE /api/wallets/:id/assets/:symbol
   @Delete(':id/assets/:symbol')
-  @ApiOperation({ summary: 'Remover ativo da carteira pelo símbolo' })
+  @ApiOperation({ summary: 'Remover ativo da carteira pelo simbolo' })
   @ApiParam({ name: 'id', description: 'UUID da carteira' })
-  @ApiParam({ name: 'symbol', description: 'Símbolo do ativo (ex: BTC)' })
+  @ApiParam({ name: 'symbol', description: 'Simbolo do ativo' })
   @ApiResponse({ status: 200, description: 'Ativo removido' })
   removeAsset(
-    @Request() req: any,
+    @Request() req: AuthenticatedRequest,
     @Param('id') id: string,
     @Param('symbol') symbol: string,
   ) {
